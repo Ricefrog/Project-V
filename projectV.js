@@ -1,6 +1,7 @@
 const canvas = document.querySelector("canvas");
 const body = document.querySelector("body");
 const ctx = canvas.getContext('2d');
+const backgroundImg = document.querySelector(".background");
 var sprite = document.querySelector("#player");
 var elderDialogBlock = "Hello Eddy. I know that life has been hard for you. When I created you I purposely gave you a hideous and malformed skull in the hopes that you would learn humility and restraint. Unfortunately, you have neither of those qualities. However, I will give you a chance to redeem yoursef and win back your long lost lover. She awaits you behind one of these doors. But behind the other two lie horrifying challenges...";
 
@@ -31,7 +32,9 @@ function getCoords(obj) {
 };
 
 
-
+function changeBackground(path) {
+    backgroundImg.setAttribute("src", path);
+};
 
 
 //object constructor
