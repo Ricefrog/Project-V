@@ -2,16 +2,23 @@ const canvas = document.querySelector("canvas");
 const body = document.querySelector("body");
 const ctx = canvas.getContext('2d');
 const backgroundImg = document.querySelector(".background");
+const audio1 = document.querySelector("#hometown");
+const audio2 = document.querySelector("#dungeon");
+const audio3 = document.querySelector("#quiz");
+const audio4 = document.querySelector("#endgame");
 let endgameActive = false;
+var notFinalScreen = true;
 let shake1 = true;
-var sprite = document.querySelector("#player");
+var sprite = document.querySelector("#player1");
 var ratKingSprite = document.querySelector("#ratKing");
 var elderDialogBlock = "Hello Eddy. I know that life has been hard for you. When I created you I purposely gave you a hideous and malformed skull in the hopes that you would learn humility and restraint. Unfortunately, you have neither of those qualities. However, I will give you a chance to redeem yoursef and win back your long lost lover. She awaits you behind one of these doors. But behind the other two lie horrifying challenges...";
 
-var player = new component(20, 20, 108, 64);
+audio1.play();
+
+var player = new component(30, 30, 108, 64);
 player.update();
 
-var guardian = new npcFriendly(15, 15, 258, 54, player);
+var guardian = new npcFriendly(25, 50, 250, 20, player);
 guardian.render();
 
 var door1 = new doorObj(104, 36, 30, 30, player);
@@ -31,7 +38,7 @@ setInterval(gameFrame, 20);
 
 //function to wipe pixels in a specified range
 function clearArea(object) {
-    ctx.clearRect(object.x, object.y, object.width, object.height)
+    ctx.clearRect(object.x, object.y+1, object.width, object.height);
 };
 
 //function to output an object's coordinates
@@ -48,6 +55,9 @@ function changeBackground(path) {
 
 //object constructor
 function component(width, height, x, y) {
+    this.frame = 0;
+    this.moving = false;
+    this.direction = "right";
     this.xSpeed = 0;
     this.ySpeed = 0;
     this.width = width;
@@ -55,7 +65,39 @@ function component(width, height, x, y) {
     this.x = x;
     this.y = y;
     this.update = function () {
-        ctx.drawImage(sprite, this.x, this.y, this.width, this.height);
+        //console.log(this.frame);
+        if (this.direction === "right" && this.moving === true) {
+            this.frame++;
+            if (this.frame <= 25 && this.frame > 0) {
+                ctx.drawImage(document.querySelector("#player1"), this.x, this.y, this.width, this.height);
+                
+            } else {
+                ctx.drawImage(document.querySelector("#player2"), this.x, this.y, this.width, this.height);
+                if (this.frame > 25){
+                    this.frame = -25;
+                }
+                
+            }
+        }
+        if (this.direction === "left" && this.moving === true) {
+            this.frame++;
+            if (this.frame <= 25 && this.frame > 0) {
+                ctx.drawImage(document.querySelector("#player3"), this.x, this.y, this.width, this.height);
+                
+            } else {
+                ctx.drawImage(document.querySelector("#player4"), this.x, this.y, this.width, this.height);
+                if (this.frame > 25){
+                    this.frame = -25;
+                }
+            }
+        }
+        if (this.direction === "right" && this.moving === false) {
+            ctx.drawImage(sprite, this.x, this.y, this.width, this.height);
+        }
+        if (this.direction === "left" && this.moving === false) {
+            ctx.drawImage(document.querySelector("#player3"), this.x, this.y, this.width, this.height);
+        }
+        
     }
     this.newPos = function () {
         if (!collisionDetection(this.x, this.y, this.width, this.height, guardian)) {
@@ -102,21 +144,25 @@ function collisionDetection(x, y, width, height, object) {
 
 
 window.addEventListener("keydown", (e) => {
+    player.moving = true;
     if (e.keyCode == 38) {
-        player.ySpeed = -2;
+        player.ySpeed = -1;
     }
     if (e.keyCode == 39) {
-        player.xSpeed = 2;
+        player.xSpeed = 1;
+        player.direction = "right";
     }
     if (e.keyCode == 40) {
-        player.ySpeed = 2;
+        player.ySpeed = 1;
     }
     if (e.keyCode == 37) {
-        player.xSpeed = -2;
+        player.xSpeed = -1;
+        player.direction = "left";
     }
 });
 
 window.addEventListener("keyup", (e) => {
+    player.moving = false;
     if (e.keyCode == 38) {
         player.ySpeed = 0;
     }
@@ -146,7 +192,16 @@ function dialogBox(x, y, width, height, dialogId, textContent) {
         let span = document.createElement("span");
         body.appendChild(span);
         span.setAttribute("id", this.dialogId);
-        span.classList.add("dialog");
+        if (ratKing.active === true) {
+            span.classList.add("ratKingDialogue");
+        }
+        if (ratKing.active === false && endgameActive === false) {
+            span.classList.add("dialog");
+        }
+        if (endgameActive === true) {
+            span.classList.add("endgameDialogue");
+        }
+        
         span.style.height = this.height+"px";
         span.style.width = this.width+"px";
         span.style.top = this.y+"px";
@@ -191,14 +246,15 @@ function enemyAsImg(width, height, x, y, player) {
 };
 
 function npcFriendly(width, height, x, y, player) {
-    this.dialog_1 = new dialogBox(x, y, 1000, 100, "First", elderDialogBlock);
+    this.dialog_1 = new dialogBox(x, y, 1000, 150, "First", elderDialogBlock);
     this.active = true;
     this.width = width;
     this.height = height;
     this.x = x;
     this.y = y;
     this.render = () => {
-        ctx.fillRect(x, y, width, height);
+        ctx.drawImage(document.querySelector("#guardian"), this.x, this.y, this.width, this.height);
+        //ctx.fillRect(x, y, width, height);
         if (player.x + player.width > this.x - 10 && this.dialog_1.dialogOpen === false) {
             this.dialog_1.display();
             
@@ -217,6 +273,7 @@ function npcFriendly(width, height, x, y, player) {
 function loadNewScreen(eventCounter) {
     if (eventCounter === 0){
         console.log("entered first door");
+        audio1.pause();
         changeBackground("images/dugeon.jpg");
         objectsScreen1.forEach(e => {
             e.active = false;
@@ -225,7 +282,8 @@ function loadNewScreen(eventCounter) {
             objectsScreen2.forEach(e => {
                 e.active = true;
             });
-        }, 5000);
+            audio2.play();
+        }, 3000);
         
         
         //play conbat music
@@ -255,10 +313,18 @@ function unlockDoors(eventOne) {
 //function that will quiz the player
 function quiz1() {
     console.log("QUIZ ACTIVATED!");
-
-    let questionOne = new dialogBox(172, 24, 300, 25, "questionOne", "Who discovered penicillin?");
+    audio2.pause();
+    audio3.play();
+    body.style.fontFamily = "'Modak', cursive";
+    body.style.fontSize = "1.5em";
+    
+    let questionOne = new dialogBox(80, 24, 300, 100, "questionOne", "You chose the wrong door. If you cannot answer one of my riddles you will die.");
     questionOne.display();
-
+    setTimeout(function(){
+        questionOne.clear();
+        questionOne.text = "Who discovered penicillin?";
+        questionOne.display();
+    }, 5500);
 
     let flashingDiv = document.createElement("div");
     let answer;
@@ -268,7 +334,14 @@ function quiz1() {
     let healthVal = 3;
     let healthSpan = document.createElement("span");
     let arr = [flashingDiv, inputBox];
-    healthSpan.textContent = `Health: ${healthVal}`;
+
+    healthSpan.innerHTML = `Health: <span>${healthVal}</span>`;
+    healthSpan.style.position = "absolute";
+    healthSpan.style.marginLeft = "3%";
+    healthSpan.style.paddingTop = "3%";
+    healthSpan.style.letterSpacing = ".05em";
+    healthSpan.style.color = "#FA9D04";
+    
 
     inputBox.classList.add("inputBox");
     submit.classList.add("submitButton");
@@ -281,7 +354,8 @@ function quiz1() {
         textInput.value = "";
         console.log(answer);
         healthVal--;
-        healthSpan.textContent = `Health: ${healthVal}`;
+        healthSpan.innerHTML = `Health: <span id="healthVal">${healthVal}</span>`;
+        document.querySelector("#healthVal").style.color = "#E7450D";
         questionOne.clear();
         if (healthVal !== 0){
             questionOne.text = `${answer} is wrong. You are an idiot.`;
@@ -319,6 +393,8 @@ function quiz1() {
         }
         if (healthVal === 0) {
             console.log("endgame triggered");
+            audio3.pause();
+            audio4.play();
         }
     });
     
@@ -330,18 +406,14 @@ function quiz1() {
     backgroundImg.style.display = "none";
     body.appendChild(flashingDiv);
     body.appendChild(inputBox);
+    document.querySelector("span span span").style.color = "#E7450D";
+    document.querySelector("span span span").setAttribute("id", "healthVal");
 
     console.log(textInput.value);
 };
 
 function endgame(arr, dialog) {
-    const inputBox = document.createElement("span");
-    const radio1 = document.createElement("input");
-    radio1.setAttribute("type", "radio");
-    const radio2 = document.createElement("input");
-    radio2.setAttribute("type", "radio");
-    const radio3 = document.createElement("input");
-    radio3.setAttribute("type", "radio");
+
     endgameActive = true;
     dialog.clear();
     ratKing.active = false;
@@ -351,51 +423,162 @@ function endgame(arr, dialog) {
     arr.forEach(e => {
         body.removeChild(e);
     });
+
+    
     setTimeout(function(){
         dialog.text = "I pity you. Because of this I will give you a final chance to redeem yourself.";
         dialog.display();
+        document.querySelector("#questionOne").style.fontSize = "2.5em";
     }, 100);
     setTimeout(function(){
         dialog.clear();
         dialog.text = "Who loves Joanna more than anything?";
         dialog.display();
-    }, 2000);
+        document.querySelector("#questionOne").style.fontSize = "2.5em";
+    }, 5000);
+    setTimeout(function() {
+        const inputBox = document.createElement("span");
+        const radio1 = document.createElement("input");
+        radio1.setAttribute("type", "radio");
+        const radio2 = document.createElement("input");
+        radio2.setAttribute("type", "radio");
+        const radio3 = document.createElement("input");
+        radio3.setAttribute("type", "radio");
+        let radios = [radio1, radio2, radio3];
+        const submit = document.createElement("button");
 
+
+        inputBox.appendChild(radio1);
+        inputBox.appendChild(radio2);
+        inputBox.appendChild(radio3);
+        inputBox.appendChild(submit);
+
+
+        let labels = [];
+        radios.forEach(e => {
+            e.style.margin = "3%";
+            let label = document.createElement("span");
+            label.textContent ="Koa";
+            label.classList.add("labels");
+            labels.push(label);
+            e.setAttribute("name", "rad");
+            inputBox.insertBefore(label, e);
+        });
+
+        
+        let colors = ["#FBDE03", "#FA9D04", "#E7450D"];
+        let count = 0;
+        labels.forEach(e => {
+            e.style.color = colors[count];
+            count++;
+        });
+
+        submit.classList.add("submitButton");
+        submit.style.marginRight = "3%";
+        submit.style.marginTop = "2%";
+        
+        submit.textContent = "SUBMIT";
+        inputBox.classList.add("inputBox");
+        inputBox.style.height = "10%";
+        body.appendChild(inputBox);
+
+        let objArr = [inputBox, canvas, backgroundImg];
+
+        submit.addEventListener("click", function() {
+            finalScreen(objArr, dialog);
+        });
+
+    }, 7000);
+    // const inputBox = document.createElement("span");
+    // const radio1 = document.createElement("input");
+    // radio1.setAttribute("type", "radio");
+    // const radio2 = document.createElement("input");
+    // radio2.setAttribute("type", "radio");
+    // const radio3 = document.createElement("input");
+    // radio3.setAttribute("type", "radio");
+    // let radios = [radio1, radio2, radio3];
+    // const submit = document.createElement("button");
+
+
+    // inputBox.appendChild(radio1);
+    // inputBox.appendChild(radio2);
+    // inputBox.appendChild(radio3);
+    // inputBox.appendChild(submit);
+
+
+    // let labels = [];
+    // radios.forEach(e => {
+    //     e.style.margin = "3%";
+    //     let label = document.createElement("span");
+    //     label.textContent ="Koa";
+    //     label.classList.add("labels");
+    //     labels.push(label);
+    //     e.setAttribute("name", "rad");
+    //     inputBox.insertBefore(label, e);
+    // });
+
+    
+    // let colors = ["#FBDE03", "#FA9D04", "#E7450D"];
+    // let count = 0;
+    // labels.forEach(e => {
+    //     e.style.color = colors[count];
+    //     count++;
+    // });
+
+    // submit.classList.add("submitButton");
+    // submit.style.marginRight = "3%";
+    
+    // submit.textContent = "SUBMIT";
+    // inputBox.classList.add("inputBox");
+    // inputBox.style.height = "10%";
+    // body.appendChild(inputBox);
+};
+
+function finalScreen(arr, dialog) {
+    dialog.clear();
+    arr.forEach(e => {
+        body.removeChild(e);
+    });
+    console.log("finalScreen");
+    notFinalScreen = false;
+    
 };
 
 function gameFrame() {
-    clearArea(player);
-    clearArea(guardian);
-    player.newPos();
-    player.update();
-    objectsScreen1.forEach(e => {
-        if (e.active === true){
-            e.render();
-        }
-    });
-    objectsScreen2.forEach(e => {
-        if (e.active === true) {
-            e.render();
-        }
-    });
-    if (endgameActive === true) {
-        console.log("shake");
-        if (shake1 === true){
-            backgroundImg.style.opacity = "0.5";
-            shake1 = false;
-        }
-        else {
-            backgroundImg.style.opacity = "1";
-            shake1 = true;
-        }
+    if (notFinalScreen){
+        clearArea(player);
+        clearArea(guardian);
+        player.newPos();
+        player.update();
+        objectsScreen1.forEach(e => {
+            if (e.active === true){
+                e.render();
+            }
+        });
+        objectsScreen2.forEach(e => {
+            if (e.active === true) {
+                e.render();
+            }
+        });
+        // if (endgameActive === true) {
+        //     console.log("shake");
+        //     if (shake1 === true){
+        //         backgroundImg.style.opacity = "0.5";
+        //         shake1 = false;
+        //     }
+        //     else {
+        //         backgroundImg.style.opacity = "1";
+        //         shake1 = true;
+        //     }
+        // }
+        
+        // if (document.querySelector("#flasher")) {
+        //    let flash = document.querySelector("#flasher");
+        //    if (flash.style.backgroundColor === "rgb(60, 0, 255)") {
+        //        flash.style.backgroundColor = "#00f9ff";
+        //    } else {
+        //        flash.style.backgroundColor = "#3c00ff";
+        //    }
+        // }
     }
-    
-    // if (document.querySelector("#flasher")) {
-    //    let flash = document.querySelector("#flasher");
-    //    if (flash.style.backgroundColor === "red") {
-    //        flash.style.backgroundColor = "blue";
-    //    } else {
-    //        flash.style.backgroundColor = "red";
-    //    }
-    // }
 };

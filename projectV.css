@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    font-family: 'Lemonada', cursive;
 }
 
 .background {
@@ -14,15 +15,15 @@ body {
 }
 
 .dialog {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: bold;
-    padding: 2%;
-    color: #39CCCC;
+    text-align: center;
+    font-weight: normal;
+    padding: 1%;
     position: absolute;
     z-index: 1;
     display: block;
+    color: #3F362A;
     background-color: #FBD9B2;
-    border: 2px black solid;
+    border: 2px #E7450D solid;
 }
 
 canvas {
@@ -39,7 +40,7 @@ canvas {
     position: absolute;
     margin: 0;
     padding: 0;
-    background-color: red;
+    background-color: #3c00ff;
     z-index: -1;
 }
 
@@ -49,18 +50,55 @@ canvas {
     right: 50%;
     height: 20%;
     width: 40%;
-    background-color: white;
+    background-color: #FEF596;
+    border: 5px #3F362A solid;
 }
 
 .submitButton {
-    margin-top: auto;
+    margin-top: 3%;
     width: 100px;
     height: 30px;
     float: right;
     font-weight: bold;
+    color: #E7450D;
+    background-color: #eadd92;
+    outline: none;
+}
+
+.submitButton::-moz-focus-inner {
+    border: 0;
 }
 
 .textInput {
-    margin-top: auto;
+    margin-top: 3%;
+    margin-right: 3%;
     float: right;
+}
+
+.ratKingDialogue {
+    text-shadow: 0 0 3px #FF0000, 0 0 5px #0000FF;
+    color: #FF01D7;
+    background-color: #01FF4F;
+    border: 3px dashed #FBDE03;
+    padding: 1%;
+    position: absolute;
+    z-index: 1;
+    letter-spacing: 0.05em;
+    line-height: 1em;
+}
+
+.endgameDialogue {
+    text-shadow: 0 0 3px #FF0000, 0 0 5px #0000FF;
+    padding: 1%;
+    position: absolute;
+    z-index: 1;
+    letter-spacing: 0.05em;
+    line-height: 1em;
+    color: #7dbaff;
+}
+
+.labels {
+    margin-left: 3%;
+    margin-top: 3%;
+
 }
