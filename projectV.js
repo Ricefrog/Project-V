@@ -419,6 +419,7 @@ function endgame(arr, dialog) {
     ratKing.active = false;
     clearArea(ratKing);
     changeBackground("images/rat.jpeg");
+    body.style.backgroundColor = "maroon";
     backgroundImg.style.display = "inline";
     arr.forEach(e => {
         body.removeChild(e);
@@ -539,9 +540,57 @@ function finalScreen(arr, dialog) {
     arr.forEach(e => {
         body.removeChild(e);
     });
+    body.style.backgroundColor = "#F9CDAD";
     console.log("finalScreen");
     notFinalScreen = false;
-    
+    const audio5 = document.createElement("audio");
+    audio5.setAttribute("src", "audio/september.mp3");
+    body.appendChild(audio5);
+    audio5.play();
+    const gif = document.createElement("iframe");
+    gif.setAttribute("src", "https://giphy.com/embed/TfKfqjt2i4GIM");
+    gif.classList.add("gif");
+
+    const imgSpan = document.createElement("span");
+    imgSpan.classList.add("imgSpan");
+    const eddy = document.createElement("img");
+    eddy.setAttribute("src", "audio/eddy1.png");
+    setInterval(function() {
+        if (eddy.getAttribute("src") == "images/eddy1.png") {
+            eddy.setAttribute("src", "images/eddy2.png");
+        } else {
+            eddy.setAttribute("src", "images/eddy1.png");
+        }
+    }, 1000);
+    const wizard = document.createElement("img");
+    wizard.setAttribute("src", "images/wizard.png");
+    const rat = document.createElement("img");
+    rat.setAttribute("src", "images/rat.jpeg");
+
+
+
+    eddy.style.height = "200px";
+    wizard.style.height = "200px";
+    rat.style.height = "200px";
+    imgSpan.appendChild(eddy);
+    imgSpan.appendChild(wizard);
+    imgSpan.appendChild(rat);
+    eddy.style.width = "34%";
+    wizard.style.width = "32%";
+    rat.style.width = "34%";
+
+
+    const titleDiv = document.createElement("div");
+    titleDiv.classList.add("title");
+    titleDiv.textContent = "Happy Valentine's Day";
+    const p = document.createElement("p");
+    p.classList.add("subtext");
+    titleDiv.appendChild(p);
+    p.textContent = "Sorry that this is lame but it deadass took forever.";
+
+    body.appendChild(titleDiv);
+    body.appendChild(imgSpan);
+    body.appendChild(gif);
 };
 
 function gameFrame() {
@@ -560,25 +609,25 @@ function gameFrame() {
                 e.render();
             }
         });
-        // if (endgameActive === true) {
-        //     console.log("shake");
-        //     if (shake1 === true){
-        //         backgroundImg.style.opacity = "0.5";
-        //         shake1 = false;
-        //     }
-        //     else {
-        //         backgroundImg.style.opacity = "1";
-        //         shake1 = true;
-        //     }
-        // }
+        if (endgameActive === true) {
+            console.log("shake");
+            if (shake1 === true){
+                backgroundImg.style.opacity = "0.5";
+                shake1 = false;
+            }
+            else {
+                backgroundImg.style.opacity = "1";
+                shake1 = true;
+            }
+        }
         
-        // if (document.querySelector("#flasher")) {
-        //    let flash = document.querySelector("#flasher");
-        //    if (flash.style.backgroundColor === "rgb(60, 0, 255)") {
-        //        flash.style.backgroundColor = "#00f9ff";
-        //    } else {
-        //        flash.style.backgroundColor = "#3c00ff";
-        //    }
-        // }
+        if (document.querySelector("#flasher")) {
+           let flash = document.querySelector("#flasher");
+           if (flash.style.backgroundColor === "rgb(60, 0, 255)") {
+               flash.style.backgroundColor = "#00f9ff";
+           } else {
+               flash.style.backgroundColor = "#3c00ff";
+           }
+        }
     }
 };
